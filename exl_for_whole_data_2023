@@ -1,0 +1,91 @@
+#####################    for 2023 dataset
+
+
+
+import os
+import pandas as pd
+import random
+
+# Root directory where the data is stored
+root_dir = '/home/test_user/Desktop/junken/datasets/10_2023/ASNR-MICCAI-BraTS2023-GLI-Challenge-TrainingData'
+
+# Initialize empty lists to store data
+sample_names = []
+t1c_names = []
+t1n_names = []
+t2f_names = []
+t2w_names = []
+seg_names = []
+fold_numbers = []
+
+# Define the number of folds
+num_folds = 4
+
+# Create a list of sample names
+sample_list = [name for name in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir, name))]
+
+# Shuffle the list of sample names
+random.shuffle(sample_list)
+
+# Split the list of sample names into folds
+fold_size = len(sample_list) // num_folds
+folds = [sample_list[i:i+fold_size] for i in range(0, len(sample_list), fold_size)]
+
+# Assign fold numbers to each sample name
+for i in range(num_folds):
+    for sample_name in folds[i]:
+        sample_path = os.path.join(root_dir, sample_name)
+        sample_names.append(sample_name)
+        t1c_name = None
+        t1n_name = None
+        t2f_name = None
+        t2w_name = None
+        seg_name = None
+
+        for file in os.listdir(sample_path):
+            if file.endswith('.nii.gz'):
+                if "t1c" in file:
+                    t1c_name = file
+                elif "t1n" in file:
+                    t1n_name = file
+                elif "t2f" in file:
+                    t2f_name = file
+                elif "t2w" in file:
+                    t2w_name = file
+                elif "seg" in file:
+                    seg_name = file
+
+        t1c_names.append(t1c_name)
+        t1n_names.append(t1n_name)
+        t2f_names.append(t2f_name)
+        t2w_names.append(t2w_name)
+        seg_names.append(seg_name)
+        fold_numbers.append(i)
+
+# Create a dictionary to store the data
+data_dict = {
+    'sample name': sample_names,
+    't1c_name': t1c_names,
+    't1n_name': t1n_names,
+    't2f_name': t2f_names,
+    't2w_name': t2w_names,
+    'seg_name': seg_names,
+    'fold_number': fold_numbers,
+}
+
+# Create a DataFrame from the dictionary
+df = pd.DataFrame(data_dict)
+
+# Save the DataFrame to an Excel file
+output_file = '/home/test_user/Desktop/junken/datasets/10_2023/ASNR-MICCAI-BraTS2023-GLI-Challenge-TrainingData.xlsx'
+df.to_excel(output_file, index=False)
+
+
+
+
+
+
+
+
+
+
