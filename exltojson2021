@@ -1,0 +1,43 @@
+###################################### json for 2021
+
+
+
+
+import pandas as pd
+import json
+
+# Read the Excel file
+df = pd.read_excel('/home/test_user/Desktop/junken/datasets/whole_2021/archive/BraTS2021_Training_Data.xlsx')
+
+# Open the output file
+with open('/home/test_user/Desktop/junken/datasets/whole_2021/archive/BraTS2021_Training_Data.json', 'w') as f:
+    # Write the opening part of the JSON structure
+    f.write('{\n    "training": [\n')
+
+    # Iterate over the DataFrame rows
+    for index, row in df.iterrows():
+        # Create a dictionary for each row
+        row_dict = {
+            "fold": row['fold_number'],
+            "image": [
+                f"{row['sample name']}/{row['t1ce_name']}",
+                f"{row['sample name']}/{row['t1_name']}",
+                f"{row['sample name']}/{row['t2_name']}",
+                f"{row['sample name']}/{row['flair_name']}"
+            ],
+            "label": f"{row['sample name']}/{row['seg_name']}"
+        }
+        # Convert the row dictionary to a JSON string
+        json_row = json.dumps(row_dict, indent=4)
+        # Add an extra level of indentation to the JSON string
+        json_row = json_row.replace('\n', '\n    ')
+        # Write the JSON string to the file
+        f.write('    ' + json_row)
+        # If this is not the last row, add a comma and a newline with indentation
+        if index < len(df) - 1:
+            f.write(',\n    ')
+        else:
+            f.write('\n')
+
+    # Write the closing part of the JSON structure
+    f.write('    ]\n}')
